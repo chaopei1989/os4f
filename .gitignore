@@ -1,3 +1,4 @@
 *.o
 hx_kernel
-
+.vscode
+mnt

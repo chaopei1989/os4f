@@ -25,30 +25,23 @@ all: $(S_OBJECTS) $(C_OBJECTS) link update_image
 
 link:
 	@echo 链接内核文件...
-	$(LD) $(LD_FLAGS) $(S_OBJECTS) $(C_OBJECTS) -o hx_kernel
+	$(LD) $(LD_FLAGS) $(S_OBJECTS) $(C_OBJECTS) -o kernel.bin
 
 .PHONY:clean
 clean:
-	$(RM) $(S_OBJECTS) $(C_OBJECTS) hx_kernel
+	$(RM) $(S_OBJECTS) $(C_OBJECTS) kernel.bin
 
 .PHONY:update_image
 update_image:
-	sudo mount floppy.img /mnt/kernel
-	sudo cp hx_kernel /mnt/kernel/hx_kernel
-	sleep 1
-	sudo umount /mnt/kernel
-
-.PHONY:mount_image
-mount_image:
-	sudo mount floppy.img /mnt/kernel
-
-.PHONY:umount_image
-umount_image:
-	sudo umount /mnt/kernel
+	sudo losetup -o 1048576 /dev/loop16 hda_32M.img
+	sudo mount /dev/loop16 mnt/
+	sudo cp kernel.bin mnt/boot/kernel.bin
+	sudo umount mnt
+	sudo losetup -d /dev/loop16
 
 .PHONY:qemu
 qemu:
-	qemu -fda floppy.img -boot a
+	sudo qemu-system-i386 -hda hda_32M.img
 
 .PHONY:bochs
 bochs:

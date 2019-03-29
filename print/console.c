@@ -1,5 +1,6 @@
 #include "console.h"
 #include "string.h"
+#include "inout.h"
 
 /**
  * VGA 0xB8000～0xB8F9F~0xBFFFF
@@ -23,58 +24,118 @@
 
 #define LEN_SINGLE_LINE 80
 
+#define BYTE_SINGLE_LINE 0xA0
+
 #define DEFAULT_FOREGROUND_COLOR rc_white
 
-#define DEFAUlt_BACKGROUND_COLOR rc_black
+#define DEFAULT_BACKGROUND_COLOR rc_black
+
+struct cursor
+{
+    uint16_t *curr;
+    uint16_t x;
+    uint16_t y;
+};
 
 /**
- * 当前cursor所在
+ * 当前cursor总是处在一行的开头
  */
-uint16_t *s_cursor = VIDEO_MSG_START;
-
-void console_clear()
-{
-    memset((void *)VIDEO_MSG_START, 0, VIDEO_T_STAT_START - VIDEO_MSG_START);
-}
-
-void console_write(char *msg)
-{
-}
-
-void console_write_f(char *msg, real_color_t f_color)
-{
-}
-
-void console_write_f_b(char *msg,
-                       real_color_t f_color,
-                       real_color_t b_color)
-{
-}
+struct cursor s_cursor = {
+    .curr = VIDEO_MSG_START,
+    .x = 1,
+    .y = 0,
+};
 
 /**
  * 指定字符指定前景背景颜色, 返回对应的双字节内存表示
  */
 inline uint16_t _atrr_char(char c, real_color_t f_color, real_color_t b_color);
 
-void console_head_status(char *head_msg)
+/**
+ * 指定字符串指定前景背景颜色显示在指定行 
+ */
+static void console_print_line(uint16_t *base_addr,
+                               const char *msg,
+                               real_color_t f_color,
+                               real_color_t b_color);
+
+static void move_cursor(uint16_t x, uint16_t y);
+
+void console_clear()
 {
-    uint16_t *base_addr = (uint16_t *)VIDEO_H_STAT_START;
-    const int str_len = strlen(head_msg);
-    const int cpy_len = LEN_SINGLE_LINE >= str_len ? str_len : LEN_SINGLE_LINE;
-    memcpy(base_addr, head_msg, cpy_len);
+    memset((void *)VIDEO_MSG_START, 0, VIDEO_T_STAT_START - VIDEO_MSG_START);
+    for (uint16_t *addr = VIDEO_MSG_START; addr < VIDEO_T_STAT_START; addr++)
+    {
+        // 全部空格符号
+        *addr = _atrr_char(
+            ' ', DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+    }
+    s_cursor.curr = VIDEO_MSG_START;
+    s_cursor.x = 0;
+    s_cursor.y = 1;
+    move_cursor(s_cursor.x, s_cursor.y);
 }
 
-void console_tail_status(char *tail_msg)
+void console_write_line(const char *msg)
+{
+    console_print_line(
+        s_cursor.curr, msg, DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+    s_cursor.curr += LEN_SINGLE_LINE;
+    s_cursor.x = 0;
+    s_cursor.y += 1;
+    move_cursor(s_cursor.x, s_cursor.y);
+}
+
+void console_head_status(const char *head_msg)
+{
+    uint16_t *base_addr = (uint16_t *)VIDEO_H_STAT_START;
+    console_print_line(base_addr, head_msg, rc_white, rc_blue);
+}
+
+void console_tail_status(const char *tail_msg)
 {
     uint16_t *base_addr = (uint16_t *)VIDEO_T_STAT_START;
-    const int str_len = strlen(tail_msg);
-    const int cpy_len = LEN_SINGLE_LINE >= str_len ? str_len : LEN_SINGLE_LINE;
-    memcpy(base_addr, tail_msg, cpy_len);
+    console_print_line(base_addr, tail_msg, rc_white, rc_red);
 }
 
 uint16_t _atrr_char(char c, real_color_t f_color, real_color_t b_color)
 {
-    uint8_t attribute_byte = (f_color << 4) | (b_color & 0x0F);
+    uint8_t attribute_byte = (b_color << 4) | (f_color & 0x0F);
     uint16_t ret = c | (attribute_byte << 8);
     return ret;
+}
+
+static void console_print_line(uint16_t *base_addr,
+                               const char *msg,
+                               real_color_t f_color,
+                               real_color_t b_color)
+{
+    int end = 0;
+    for (size_t i = 0; i < LEN_SINGLE_LINE; i++)
+    {
+        if (!end) // 没到要显示字符的结尾
+        {
+            char c = msg[i];
+            end = (c == 0) ? 1 : 0;
+            base_addr[i] = _atrr_char(c, f_color, b_color);
+        }
+        else
+        {
+            // 剩下的全部空格符号
+            base_addr[i] = _atrr_char(
+                ' ', DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+        }
+    }
+}
+
+static void move_cursor(uint16_t x, uint16_t y)
+{
+    uint16_t cursor_location = y * LEN_SINGLE_LINE + x;
+
+    // 在这里用到的两个内部寄存器的编号为14与15，分别表示光标位置
+    // 的高8位与低8位。
+    outb(0x3D4, 14);                   // 告诉 VGA 我们要设置光标的高字节
+    outb(0x3D5, cursor_location >> 8); // 发送高 8 位
+    outb(0x3D4, 15);                   // 告诉 VGA 我们要设置光标的低字节
+    outb(0x3D5, cursor_location);      // 发送低 8 位
 }

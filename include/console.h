@@ -30,25 +30,8 @@ void console_clear();
  * 
  * @param msg 要打印的信息
  */
-void console_write(char *msg);
+void console_write_line(const char *msg);
 
-/**
- * 打印信息, 指定前景色, 默认背景色.
- * 
- * @param msg 要打印的信息
- * @param f_color 前景色
- */
-void console_write_f(char *msg, real_color_t f_color);
+void console_head_status(const char *head_msg);
 
-/**
- * 打印信息, 指定前景色, 指定背景色.
- * 
- * @param msg 要打印的信息
- * @param f_color 前景色
- * @param b_color 背景色
- */
-void console_write_f_b(char *msg, real_color_t f_color, real_color_t b_color);
-
-void console_head_status(char *head_msg);
-
-void console_tail_status(char *tail_msg);
+void console_tail_status(const char *tail_msg);

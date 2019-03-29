@@ -18,5 +18,6 @@ typedef unsigned char  uint8_t;
 typedef          char  int8_t;
 
 typedef unsigned int   size_t;
+typedef void*   addr_t;
 
 #endif  // INCLUDE_TYPES_H_

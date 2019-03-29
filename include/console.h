@@ -49,6 +49,6 @@ void console_write_f(char *msg, real_color_t f_color);
  */
 void console_write_f_b(char *msg, real_color_t f_color, real_color_t b_color);
 
-void head_status();
+void console_head_status(char *head_msg);
 
-void tail_status();
+void console_tail_status(char *tail_msg);

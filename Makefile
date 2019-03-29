@@ -36,6 +36,7 @@ update_image:
 	sudo losetup -o 1048576 /dev/loop16 hda_32M.img
 	sudo mount /dev/loop16 mnt/
 	sudo cp kernel.bin mnt/boot/kernel.bin
+	sleep 1
 	sudo umount mnt
 	sudo losetup -d /dev/loop16
 

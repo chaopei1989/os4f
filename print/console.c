@@ -24,6 +24,8 @@
 
 #define LEN_SINGLE_LINE 80
 
+#define LEN_ROWS 25
+
 #define BYTE_SINGLE_LINE 0xA0
 
 #define DEFAULT_FOREGROUND_COLOR rc_white
@@ -61,9 +63,10 @@ static void console_print_line(uint16_t *base_addr,
 
 static void move_cursor(uint16_t x, uint16_t y);
 
+static void scroll_up_line(uint16_t line);
+
 void console_clear()
 {
-    memset((void *)VIDEO_MSG_START, 0, VIDEO_T_STAT_START - VIDEO_MSG_START);
     for (uint16_t *addr = VIDEO_MSG_START; addr < VIDEO_T_STAT_START; addr++)
     {
         // 全部空格符号
@@ -84,6 +87,11 @@ void console_write_line(const char *msg)
     s_cursor.x = 0;
     s_cursor.y += 1;
     move_cursor(s_cursor.x, s_cursor.y);
+    // 如果到了最后一行, 往上滚一行
+    if (s_cursor.y == LEN_ROWS - 1)
+    {
+        scroll_up_line(1);
+    }
 }
 
 void console_head_status(const char *head_msg)
@@ -138,4 +146,34 @@ static void move_cursor(uint16_t x, uint16_t y)
     outb(0x3D5, cursor_location >> 8); // 发送高 8 位
     outb(0x3D4, 15);                   // 告诉 VGA 我们要设置光标的低字节
     outb(0x3D5, cursor_location);      // 发送低 8 位
+}
+
+static void scroll_up_line(uint16_t line)
+{
+    // 还剩line行是空
+    uint16_t cpy_lines = LEN_ROWS - 2 - line;
+    if (cpy_lines > 0)
+    {
+        // 上滚是最简单的, 直接memcpy
+        memcpy(VIDEO_MSG_START,
+               VIDEO_T_STAT_START - cpy_lines * BYTE_SINGLE_LINE,
+               cpy_lines * BYTE_SINGLE_LINE);
+        s_cursor.curr -= line * LEN_SINGLE_LINE;
+        s_cursor.x = 0;
+        s_cursor.y -= line;
+    }
+    else
+    {
+        s_cursor.curr = VIDEO_MSG_START;
+        s_cursor.x = 0;
+        s_cursor.y = 1;
+    }
+    move_cursor(s_cursor.x, s_cursor.y);
+    for (uint16_t *addr = VIDEO_MSG_START + cpy_lines * BYTE_SINGLE_LINE;
+         addr < VIDEO_T_STAT_START; addr++)
+    {
+        // 全部空格符号
+        *addr = _atrr_char(
+            ' ', DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+    }
 }

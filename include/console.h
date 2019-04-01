@@ -1,3 +1,6 @@
+#ifndef INCLUDE_CONSOLE_H_
+#define INCLUDE_CONSOLE_H_
+
 #include "types.h"
 
 typedef enum real_color
@@ -35,3 +38,5 @@ void console_write_line(const char *msg);
 void console_head_status(const char *head_msg);
 
 void console_tail_status(const char *tail_msg);
+
+#endif // INCLUDE_CONSOLE_H_

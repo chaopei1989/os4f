@@ -1,5 +1,5 @@
-#include "gdt.h"
-#include "console.h"
+#include <gdt.h>
+#include <console.h>
 
 // 全局描述符表长度
 #define GDT_LENGTH 5
@@ -26,17 +26,17 @@ void init_gdt()
 
     // 采用 Intel 平坦模型
     console_write_line("Init GDT");
-    console_write_line("Index|Base|Limit|Access|Gran");
+    console_write_line("Index|Base|Limit     |Access|Gran");
     gdt_set_gate(0, 0, 0, 0, 0);                // 按照 Intel 文档要求，第一个描述符必须全 0
-    console_write_line("0|0|0|0|0");
+    console_write_line("0    |0   |0         |0     |0");
     gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // 指令段
-    console_write_line("1|0|0xFFFFFFFF|0x9A|0xCF");
+    console_write_line("1    |0   |0xFFFFFFFF|0x9A  |0xCF");
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // 数据段
-    console_write_line("2|0|0xFFFFFFFF|0x92|0xCF");
+    console_write_line("2    |0   |0xFFFFFFFF|0x92  |0xCF");
     gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // 用户模式代码段
-    console_write_line("3|0|0xFFFFFFFF|0xFA|0xCF");
+    console_write_line("3    |0   |0xFFFFFFFF|0xFA  |0xCF");
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // 用户模式数据段
-    console_write_line("4|0|0xFFFFFFFF|0xF2|0xCF");
+    console_write_line("4    |0   |0xFFFFFFFF|0xF2  |0xCF");
 
     console_write_line("Flus GDT and Set CR0.");
     // 加载全局描述符表地址到 GPTR 寄存器

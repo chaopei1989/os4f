@@ -1,3 +1,5 @@
+[GLOBAL gdt_flush]  
+
 gdt_flush:
     mov eax, [esp+4]    ; 参数存入 eax 寄存器
     lgdt [eax]          ; 加载到 GDTR [修改原先GRUB设置]
@@ -9,9 +11,9 @@ gdt_flush:
     mov gs, ax
     mov ss, ax
 
-    mov ax, cr0         ; CR0 最低位置为0
-    and ax, 0xfffe
-    mov cr0, ax
+    mov eax, cr0         ; CR0 最低位置为0
+    or eax, 0x1
+    mov cr0, eax
 
     jmp 0x08:.flush     ; 远跳转， 0x08 是我们的代码段描述符
                         ; 远跳目的是清空流水线并串行化处理器

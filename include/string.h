@@ -1,7 +1,7 @@
 #ifndef INCLUDE_STRING_H_
 #define INCLUDE_STRING_H_
 
-#include "types.h"
+#include <types.h>
 
 void *memset(void *s, char ch, size_t n);
 

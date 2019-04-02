@@ -1,4 +1,4 @@
-#include "string.h"
+#include <string.h>
 
 void *memset(void *s, char ch, size_t n)
 {
@@ -35,3 +35,5 @@ size_t strlen(char const *str)
     } while (1);
     return len;
 }
+
+int 

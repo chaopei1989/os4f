@@ -9,6 +9,8 @@ CC = gcc
 LD = ld
 ASM = nasm
 
+LOOP_DEV = /dev/loop17
+
 C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -f elf -g -F stabs
@@ -33,12 +35,12 @@ clean:
 
 .PHONY:update_image
 update_image:
-	sudo losetup -o 1048576 /dev/loop16 hda_32M.img
-	sudo mount /dev/loop16 mnt/
+	sudo losetup -o 1048576 $(LOOP_DEV) hda_32M.img
+	sudo mount $(LOOP_DEV) mnt/
 	sudo cp kernel.bin mnt/boot/kernel.bin
 	sleep 1
 	sudo umount mnt
-	sudo losetup -d /dev/loop16
+	sudo losetup -d $(LOOP_DEV)
 
 .PHONY:qemu
 qemu:

@@ -1,6 +1,6 @@
-#include "console.h"
-#include "string.h"
-#include "inout.h"
+#include <console.h>
+#include <string.h>
+#include <inout.h>
 
 /**
  * VGA 0xB8000～0xB8F9F~0xBFFFF

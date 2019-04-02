@@ -1,5 +1,5 @@
-#include "console.h"
-#include "gdt.h"
+#include <console.h>
+#include <gdt.h>
 
 static void console_fuck_welcome();
 

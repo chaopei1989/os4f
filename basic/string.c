@@ -36,4 +36,22 @@ size_t strlen(char const *str)
     return len;
 }
 
-int 
+void h32toa(unsigned int hex32, char *c)
+{
+    // hex-4字节, c-10字符
+    c[0] = '0';
+    c[1] = 'x';
+    for (size_t i = 0; i < 8; i++)
+    {
+        int t = 0xf & (hex32 >> (i << 2));
+        if (t < 10)
+        {
+            c[7 - i + 2] = t + '0';
+        }
+        else
+        {
+            c[7 - i + 2] = t - 10 + 'A';
+        }
+    }
+    c[10] = '\0';
+}

@@ -56,10 +56,11 @@ inline uint16_t _atrr_char(char c, real_color_t f_color, real_color_t b_color);
 /**
  * 指定字符串指定前景背景颜色显示在指定行 
  */
-static void console_print_line(uint16_t *base_addr,
-                               const char *msg,
-                               real_color_t f_color,
-                               real_color_t b_color);
+static void _console_print_line(uint16_t *base_addr,
+                                const char *msg,
+                                size_t size,
+                                real_color_t f_color,
+                                real_color_t b_color);
 
 static void move_cursor(uint16_t x, uint16_t y);
 
@@ -67,13 +68,14 @@ static void scroll_up_line(uint16_t line);
 
 void console_clear()
 {
-    for (uint16_t *addr = VIDEO_MSG_START; addr < VIDEO_T_STAT_START; addr++)
+    for (uint16_t *addr = (uint16_t *)VIDEO_MSG_START;
+         addr < (uint16_t *)VIDEO_T_STAT_START; addr++)
     {
         // 全部空格符号
         *addr = _atrr_char(
             ' ', DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
     }
-    s_cursor.curr = VIDEO_MSG_START;
+    s_cursor.curr = (uint16_t *)VIDEO_MSG_START;
     s_cursor.x = 0;
     s_cursor.y = 1;
     move_cursor(s_cursor.x, s_cursor.y);
@@ -81,29 +83,62 @@ void console_clear()
 
 void console_write_line(const char *msg)
 {
-    console_print_line(
-        s_cursor.curr, msg, DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
-    s_cursor.curr += LEN_SINGLE_LINE;
-    s_cursor.x = 0;
-    s_cursor.y += 1;
-    move_cursor(s_cursor.x, s_cursor.y);
-    // 如果到了最后一行, 往上滚一行
-    if (s_cursor.y == LEN_ROWS - 1)
+    int end = 0;
+    char tmp[LEN_SINGLE_LINE];
+    for (;;)
     {
-        scroll_up_line(1);
+        // split by '\n'
+        memset(tmp, 0, LEN_SINGLE_LINE);
+        for (int i = 0; i < LEN_SINGLE_LINE; i++)
+        {
+            if (*msg != 0)
+            {
+                if (*msg != '\n')
+                {
+                    tmp[i] = *msg;
+                    ++msg;
+                }
+                else
+                {
+                    // \n时则换行
+                    ++msg;
+                    break;
+                }
+            }
+            else
+            {
+                end = 1;
+                break;
+            }
+        }
+        _console_print_line(
+            s_cursor.curr, tmp, LEN_SINGLE_LINE, DEFAULT_FOREGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+        s_cursor.curr += LEN_SINGLE_LINE;
+        s_cursor.x = 0;
+        s_cursor.y += 1;
+        move_cursor(s_cursor.x, s_cursor.y);
+        // 如果到了最后一行, 往上滚一行
+        if (s_cursor.y == LEN_ROWS - 1)
+        {
+            scroll_up_line(1);
+        }
+        if (end)
+        {
+            break;
+        }
     }
 }
 
 void console_head_status(const char *head_msg)
 {
     uint16_t *base_addr = (uint16_t *)VIDEO_H_STAT_START;
-    console_print_line(base_addr, head_msg, rc_white, rc_blue);
+    _console_print_line(base_addr, head_msg, strlen(head_msg), rc_white, rc_blue);
 }
 
 void console_tail_status(const char *tail_msg)
 {
     uint16_t *base_addr = (uint16_t *)VIDEO_T_STAT_START;
-    console_print_line(base_addr, tail_msg, rc_white, rc_red);
+    _console_print_line(base_addr, tail_msg, strlen(tail_msg), rc_white, rc_red);
 }
 
 uint16_t _atrr_char(char c, real_color_t f_color, real_color_t b_color)
@@ -113,10 +148,11 @@ uint16_t _atrr_char(char c, real_color_t f_color, real_color_t b_color)
     return ret;
 }
 
-static void console_print_line(uint16_t *base_addr,
-                               const char *msg,
-                               real_color_t f_color,
-                               real_color_t b_color)
+static void _console_print_line(uint16_t *base_addr,
+                                const char *msg,
+                                size_t size,
+                                real_color_t f_color,
+                                real_color_t b_color)
 {
     int end = 0;
     for (size_t i = 0; i < LEN_SINGLE_LINE; i++)
@@ -124,7 +160,7 @@ static void console_print_line(uint16_t *base_addr,
         if (!end) // 没到要显示字符的结尾
         {
             char c = msg[i];
-            end = (c == 0) ? 1 : 0;
+            end = (c == 0 || i + 1 >= size) ? 1 : 0;
             base_addr[i] = _atrr_char(c, f_color, b_color);
         }
         else
@@ -155,8 +191,8 @@ static void scroll_up_line(uint16_t line)
     if (cpy_lines > 0)
     {
         // 上滚是最简单的, 直接memcpy
-        memcpy(VIDEO_MSG_START,
-               VIDEO_T_STAT_START - cpy_lines * BYTE_SINGLE_LINE,
+        memcpy((void *)VIDEO_MSG_START,
+               (void *)VIDEO_T_STAT_START - cpy_lines * BYTE_SINGLE_LINE,
                cpy_lines * BYTE_SINGLE_LINE);
         s_cursor.curr -= line * LEN_SINGLE_LINE;
         s_cursor.x = 0;
@@ -164,13 +200,13 @@ static void scroll_up_line(uint16_t line)
     }
     else
     {
-        s_cursor.curr = VIDEO_MSG_START;
+        s_cursor.curr = (uint16_t *)VIDEO_MSG_START;
         s_cursor.x = 0;
         s_cursor.y = 1;
     }
     move_cursor(s_cursor.x, s_cursor.y);
-    for (uint16_t *addr = VIDEO_MSG_START + cpy_lines * BYTE_SINGLE_LINE;
-         addr < VIDEO_T_STAT_START; addr++)
+    for (uint16_t *addr = (uint16_t *)(VIDEO_MSG_START + cpy_lines * BYTE_SINGLE_LINE);
+         addr < (uint16_t *)VIDEO_T_STAT_START; addr++)
     {
         // 全部空格符号
         *addr = _atrr_char(

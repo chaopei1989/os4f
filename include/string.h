@@ -9,4 +9,6 @@ void *memcpy(void *dest, void *src, unsigned int count);
 
 size_t strlen(char const* str);
 
+void h32toa(unsigned int hex32, char *c);
+
 #endif  // INCLUDE_STRING_H_

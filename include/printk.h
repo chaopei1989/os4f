@@ -11,6 +11,9 @@ void printk(char *fmt, ...);
  */ 
 void printk_buff(char *buff, int len, int buff_offset, char *fmt, ...);
 
+/**
+ * 打印当前的程序运行状态（各大寄存器，栈顶栈底）
+ */ 
 void print_cur_status();
 
 #endif // INCLUDE_PRINTK_H_

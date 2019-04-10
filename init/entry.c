@@ -11,7 +11,7 @@ int kern_entry()
 {
     console_fuck_welcome();
     print_cur_status();
-
+    print_cur_gdt();
     // print EIP
     // x86_get_pc();
     // uint32_t reg_eax = 0;

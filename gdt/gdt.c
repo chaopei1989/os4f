@@ -24,21 +24,16 @@ void init_gdt()
     gdt_ptr.base = (uint32_t)&gdt_entries;
 
     // 采用 Intel 平坦模型
+    printk("Init GDT Now");
     gdt_set_gate(0, 0, 0, 0, 0);                // 按照 Intel 文档要求，第一个描述符必须全 0
-    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x92, 0xCF); // 数据段
-    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x9A, 0xCF); // 指令段
+    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // 指令段
+    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // 数据段
     gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // 用户模式代码段
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // 用户模式数据段
-    printk("Init GDT Now\n"
-           "Index|Base|Limit     |Access|Gran   |Desc\n"
-           "0    |0   |0         |0     |0      |For Intel\n"
-           "1    |0   |0xFFFFFFFF|0x92  |0xCF   |Data Segment\n"
-           "2    |0   |0xFFFFFFFF|0x9A  |0xCF   |Code Segment\n"
-           "3    |0   |0xFFFFFFFF|0xFA  |0xCF   |User Code Segment\n"
-           "4    |0   |0xFFFFFFFF|0xF2  |0xCF   |User Data Segment\n"
-           "Flush GDT");
     // 加载全局描述符表地址到 GPTR 寄存器
+    printk("Flush GDT");
     gdt_flush((uint32_t)&gdt_ptr);
+    print_cur_gdt();
 }
 
 // 全局描述符表构造函数，根据下标构造
@@ -54,4 +49,28 @@ static void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t acc
 
     gdt_entries[num].granularity |= gran & 0xF0;
     gdt_entries[num].access = access;
+}
+
+void print_cur_gdt()
+{
+    gdt_ptr_t reg_gdtr;
+    asm volatile("sgdt %0;"
+                 : "=m"(reg_gdtr));
+    gdt_entry_t *cur_gdts = (gdt_entry_t *)reg_gdtr.base;
+    printk("print_cur_gdt:\n"
+           "gdtr_H32= %x;\n"
+           "gdtr_L16= %x;\n"
+           "Index|Base      |Limit     |Access    |Gran      ",
+           reg_gdtr.base,
+           reg_gdtr.limit);
+    for (int i = 0; i < (reg_gdtr.limit + 1) / 8; i++)
+    {
+        uint32_t base = ((cur_gdts + i)->base_low) |
+                        ((cur_gdts + i)->base_middle << 16) |
+                        ((cur_gdts + i)->base_high << 24);
+        uint32_t limit = ((cur_gdts + i)->limit_low) |
+                         ((cur_gdts + i)->granularity << 16);
+        printk("%d   |%x|%x|%x|%x|",
+               i, base, limit, (cur_gdts + i)->access, (cur_gdts + i)->granularity);
+    }
 }

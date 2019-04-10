@@ -3,6 +3,7 @@
 #include <vargs.h>
 #include <console.h>
 #include <printk.h>
+#include <gdt.h>
 
 static void printk_buff_args(char *buff, int len, int buff_offset, char *fmt, char *args);
 
@@ -107,10 +108,8 @@ static void printk_buff_args(char *buff,
 
 void print_cur_status()
 {
-    static int round = 0;
-    uint32_t reg0 = 0, reg1 = 0, reg2 = 0, reg3 = 0, reg4 = 0, reg5 = 0;
+    uint32_t reg_cs = 0, reg_ds = 0, reg_es = 0, reg_ss = 0, reg_ebp = 0, reg_esp = 0;
     uint32_t reg_cr0 = 0;
-
     asm volatile("mov %%cs, %0;"
                  "mov %%ds, %1;"
                  "mov %%es, %2;"
@@ -121,16 +120,18 @@ void print_cur_status()
                  "mov %%cr0, %%eax;"
                  "mov %%eax, %6;"
                  "pop %%eax;"
-                 : "=m"(reg0), "=m"(reg1), "=m"(reg2), "=m"(reg3), "=m"(reg4), "=m"(reg5),
+                 : "=m"(reg_cs), "=m"(reg_ds), "=m"(reg_es), "=m"(reg_ss),
+                   "=m"(reg_ebp), "=m"(reg_esp),
                    "=m"(reg_cr0));
 
-    // 打印当前的运行级别
-    printk("round %d:\n"
-           "  @ring %x;\n"
-           "  cs  = %x; ds  = %x;\n"
-           "  es  = %x; ss  = %x;\n"
-           "  ebp = %x; esp = %x;\n"
-           "  cr0 = %x",
-           round, reg1 & 0x3, reg0, reg1, reg2, reg3, reg4, reg5, reg_cr0);
-    ++round;
+    printk("@ring %x;\n"
+           "cs  = %x; ds  = %x;\n"
+           "es  = %x; ss  = %x;\n"
+           "ebp = %x; esp = %x;\n"
+           "cr0 = %x;",
+           reg_ds & 0x3,
+           reg_cs, reg_ds,
+           reg_es, reg_ss,
+           reg_ebp, reg_esp,
+           reg_cr0);
 }

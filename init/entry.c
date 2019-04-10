@@ -10,9 +10,15 @@ static void protect_enable();
 int kern_entry()
 {
     console_fuck_welcome();
-    protect_enable();
-    
     print_cur_status();
+    // print EIP
+    x86_get_pc();
+    uint32_t reg_eax = 0;
+    asm volatile("mov %%eax, %0;"
+                 : "=m"(reg_eax));
+    printk("after x86_get_pc_thunk, reg_eax=%x", reg_eax);
+    // open protect mode
+    protect_enable();
     return 0;
 }
 

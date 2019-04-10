@@ -4,7 +4,7 @@
 #include <console.h>
 #include <printk.h>
 
-static void _printk_buff_args(char *buff, int len, int buff_offset, char *fmt, char *args);
+static void printk_buff_args(char *buff, int len, int buff_offset, char *fmt, char *args);
 
 void printk(char *fmt, ...)
 {
@@ -13,7 +13,7 @@ void printk(char *fmt, ...)
     memset(buff, 0, 1024);
     va_list args;
     VA_START(args, fmt);
-    _printk_buff_args((char *)buff, 1024 - 1, 0, fmt, args);
+    printk_buff_args((char *)buff, 1024 - 1, 0, fmt, args);
     console_write_line(buff);
     VA_END(args);
 }
@@ -22,15 +22,15 @@ void printk_buff(char *buff, int len, int buff_offset, char *fmt, ...)
 {
     va_list args;
     VA_START(args, fmt);
-    _printk_buff_args((char *)buff, len, buff_offset, fmt, args);
+    printk_buff_args((char *)buff, len, buff_offset, fmt, args);
     VA_END(args);
 }
 
-static void _printk_buff_args(char *buff,
-                              int len,
-                              int buff_offset,
-                              char *fmt,
-                              va_list args)
+static void printk_buff_args(char *buff,
+                             int len,
+                             int buff_offset,
+                             char *fmt,
+                             va_list args)
 {
     if (buff_offset > len - 1)
     {
@@ -77,6 +77,20 @@ static void _printk_buff_args(char *buff,
                 }
                 break;
             }
+            case 'd':
+            {
+                ++i;
+                unsigned int next_arg = VA_ARG(args, unsigned int);
+                char msg[11];
+                // 取值
+                int next_arg_len = itoa((int)next_arg, msg);
+                if (next_arg_len > 0 && next_arg_len + buff_offset <= len - 1)
+                {
+                    memcpy((void *)buff + buff_offset, (void *)msg, next_arg_len);
+                    buff_offset += next_arg_len;
+                }
+                break;
+            }
             default:
             {
                 buff[buff_offset++] = '%';
@@ -111,11 +125,11 @@ void print_cur_status()
                    "=m"(reg_cr0));
 
     // 打印当前的运行级别
-    printk("round %x:\n"
+    printk("round %d:\n"
            "  @ring %x;\n"
-           "  cs = %x; ds = %x;\n"
-           "  es = %x; ss = %x;\n"
-           "  ebp= %x; esp= %x;\n"
+           "  cs  = %x; ds  = %x;\n"
+           "  es  = %x; ss  = %x;\n"
+           "  ebp = %x; esp = %x;\n"
            "  cr0 = %x",
            round, reg1 & 0x3, reg0, reg1, reg2, reg3, reg4, reg5, reg_cr0);
     ++round;

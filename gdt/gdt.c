@@ -36,7 +36,7 @@ void init_gdt()
            "2    |0   |0xFFFFFFFF|0x9A  |0xCF   |Code Segment\n"
            "3    |0   |0xFFFFFFFF|0xFA  |0xCF   |User Code Segment\n"
            "4    |0   |0xFFFFFFFF|0xF2  |0xCF   |User Data Segment\n"
-           "Flus GDT and Set CR0.");
+           "Flush GDT");
     // 加载全局描述符表地址到 GPTR 寄存器
     gdt_flush((uint32_t)&gdt_ptr);
 }

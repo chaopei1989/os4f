@@ -1,7 +1,9 @@
 #include <console.h>
 #include <gdt.h>
+#include <idt.h>
 #include <string.h>
 #include <printk.h>
+#include <timer.h>
 
 static void console_fuck_welcome();
 
@@ -10,15 +12,6 @@ static int check_protect_enable();
 int kern_entry()
 {
     console_fuck_welcome();
-    print_cur_status();
-    print_cur_gdt();
-    // print EIP
-    // x86_get_pc();
-    // uint32_t reg_eax = 0;
-    // asm volatile("mov %%eax, %0;"
-    //              : "=m"(reg_eax));
-    // printk(after x86_get_pc_thunk, reg_eax=%x", reg_eax);
-
     if (check_protect_enable())
     {
         printk("PE and A20 maybe set by grub, we just make sure new gdt init here.");
@@ -27,10 +20,19 @@ int kern_entry()
     {
         // TODO: entry PE
     }
-
     // flush gdt
     init_gdt();
-
+    // flush idt
+    init_idt();
+    print_cur_status();
+    // timer 
+    init_timer(100);
+    // test interrupt
+    asm volatile("int $0x02");
+    asm volatile("int $0x04");
+    asm volatile("int $0x06");
+    // 开启中断
+    asm volatile ("sti");
     return 0;
 }
 

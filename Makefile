@@ -9,7 +9,7 @@ CC = gcc
 LD = ld
 ASM = nasm
 
-LOOP_DEV = /dev/loop17
+LOOP_DEV = /dev/loop19
 
 C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib

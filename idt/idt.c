@@ -1,5 +1,7 @@
 #include <idt.h>
-#include <isr.h>
+#include <int.h>
+#include <string.h>
+#include <inout.h>
 
 // 中断描述符表
 idt_entry_t idt_entries[256];
@@ -13,15 +15,19 @@ static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags
 // 声明加载 IDTR 的函数
 extern void idt_flush(uint32_t);
 
+static void init_8259a_pic();
+
 // 初始化中断描述符表
 void init_idt()
 {
-    bzero((uint8_t *)&interrupt_handlers, sizeof(interrupt_handler_t) * 256);
+    init_8259a_pic();
+
+    memset((void *)&interrupt_handlers, 0, sizeof(interrupt_handler_t) * 256);
 
     idt_ptr.limit = sizeof(idt_entry_t) * 256 - 1;
     idt_ptr.base = (uint32_t)&idt_entries;
 
-    bzero((uint8_t *)&idt_entries, sizeof(idt_entry_t) * 256);
+    memset((void *)&idt_entries, 0, sizeof(idt_entry_t) * 256);
 
     // 0-32:  用于 CPU 的中断处理
     idt_set_gate(0, (uint32_t)isr0, 0x08, 0x8E);
@@ -57,6 +63,25 @@ void init_idt()
     idt_set_gate(30, (uint32_t)isr30, 0x08, 0x8E);
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
 
+    idt_set_gate(32, (uint32_t)irq0, 0x08, 0x8E);
+    idt_set_gate(33, (uint32_t)irq1, 0x08, 0x8E);
+    idt_set_gate(34, (uint32_t)irq2, 0x08, 0x8E);
+    idt_set_gate(35, (uint32_t)irq3, 0x08, 0x8E);
+    idt_set_gate(36, (uint32_t)irq4, 0x08, 0x8E);
+    idt_set_gate(37, (uint32_t)irq5, 0x08, 0x8E);
+    idt_set_gate(38, (uint32_t)irq6, 0x08, 0x8E);
+    idt_set_gate(39, (uint32_t)irq7, 0x08, 0x8E);
+    idt_set_gate(40, (uint32_t)irq8, 0x08, 0x8E);
+    idt_set_gate(41, (uint32_t)irq9, 0x08, 0x8E);
+    idt_set_gate(42, (uint32_t)irq10, 0x08, 0x8E);
+    idt_set_gate(43, (uint32_t)irq11, 0x08, 0x8E);
+    idt_set_gate(44, (uint32_t)irq12, 0x08, 0x8E);
+    idt_set_gate(45, (uint32_t)irq13, 0x08, 0x8E);
+    idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
+    idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
+    
+    // TODO: bzero for idt 47-254
+
     // 255 将来用于实现系统调用
     idt_set_gate(255, (uint32_t)isr255, 0x08, 0x8E);
 
@@ -73,7 +98,40 @@ static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags
     idt_entries[num].sel = sel;
     idt_entries[num].always0 = 0;
 
-    // 先留下 0x60 这个魔数，以后实现用户态时候
+    // TODO: 先留下 0x60 这个魔数，以后实现用户态时候
     // 这个与运算可以设置中断门的特权级别为 3
     idt_entries[num].flags = flags; // | 0x60
+}
+
+static void init_8259a_pic()
+{
+    // 重新映射 IRQ 表
+    // 两片级联的 Intel 8259A 芯片
+    // 主片端口 0x20 0x21
+    // 从片端口 0xA0 0xA1
+        
+    // 初始化主片、从片
+    // 0001 0001
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    
+    // 设置主片 IRQ 从 0x20(32) 号中断开始
+    outb(0x21, 0x20);
+
+    // 设置从片 IRQ 从 0x28(40) 号中断开始
+    outb(0xA1, 0x28);
+    
+    // 设置主片 IR2 引脚连接从片
+    outb(0x21, 0x04);
+
+    // 告诉从片输出引脚和主片 IR2 号相连
+    outb(0xA1, 0x02);
+    
+    // 设置主片和从片按照 8086 的方式工作
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    
+    // 设置主从片允许中断
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);
 }

@@ -9,7 +9,11 @@ idt_entry_t idt_entries[256];
 // IDTR
 idt_ptr_t idt_ptr;
 
-// 设置中断描述符
+/**
+ * 设置中断描述符
+ * 
+ * @params flags低4位: 0111b-interrupt，1010b-task，1111b-trap
+ */ 
 static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 
 // 声明加载 IDTR 的函数

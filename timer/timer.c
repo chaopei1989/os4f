@@ -10,12 +10,12 @@ char buff[1024];
 void timer_callback(pt_regs *regs)
 {
     static uint32_t tick = 0;
-    static uint32_t second = 0;
+    static uint32_t wall_time = 0;
     // (1000ms/HZ)=10ms per tick.
     if (++tick == 100)
     {
         tick = 0;
-        printk_buff(buff, 1023, 0, "Welcome to OS4F, Enjoy it! Second=%d", ++second);
+        printk_buff(buff, 1023, 0, "Welcome to OS4F, Enjoy it! Wall Time: %x", ++wall_time);
         console_head_status(buff);
     }
 }

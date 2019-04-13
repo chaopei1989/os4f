@@ -110,6 +110,7 @@ void print_cur_status()
 {
     uint32_t reg_cs = 0, reg_ds = 0, reg_es = 0, reg_ss = 0, reg_ebp = 0, reg_esp = 0;
     uint32_t reg_cr0 = 0;
+    uint32_t reg_eflags = 0;
     asm volatile("mov %%cs, %0;"
                  "mov %%ds, %1;"
                  "mov %%es, %2;"
@@ -119,19 +120,25 @@ void print_cur_status()
                  "push %%eax;"
                  "mov %%cr0, %%eax;"
                  "mov %%eax, %6;"
+                 "pushfl;"
+                 "pop %%eax;"
+                 "mov %%eax, %7;"
+                 "push %%eax;"
+                 "popfl;"
                  "pop %%eax;"
                  : "=m"(reg_cs), "=m"(reg_ds), "=m"(reg_es), "=m"(reg_ss),
                    "=m"(reg_ebp), "=m"(reg_esp),
-                   "=m"(reg_cr0));
+                   "=m"(reg_cr0),
+                   "=m"(reg_eflags));
 
     printk("@ring %x;\n"
            "cs  = %x; ds  = %x;\n"
            "es  = %x; ss  = %x;\n"
            "ebp = %x; esp = %x;\n"
-           "cr0 = %x;",
+           "cr0 = %x; efl = %x;",
            reg_ds & 0x3,
            reg_cs, reg_ds,
            reg_es, reg_ss,
            reg_ebp, reg_esp,
-           reg_cr0);
+           reg_cr0, reg_eflags);
 }

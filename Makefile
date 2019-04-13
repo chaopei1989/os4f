@@ -44,7 +44,11 @@ update_image:
 
 .PHONY:qemu
 qemu:
-	sudo qemu-system-i386 -hda hda_32M.img
+	sudo qemu-system-i386 -hda hda_32M.img -curses
+
+.PHONY:kill
+kill:
+	ps -ef | grep qemu | grep -v grep | awk '{print $$2}'|xargs sudo kill -9
 
 .PHONY:bochs
 bochs:

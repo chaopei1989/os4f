@@ -11,6 +11,8 @@ static int check_protect_enable();
 
 int kern_entry()
 {
+    // int reject
+    asm volatile ("cli");
     console_fuck_welcome();
     if (check_protect_enable())
     {
@@ -24,15 +26,19 @@ int kern_entry()
     init_gdt();
     // flush idt
     init_idt();
-    print_cur_status();
-    // timer 
-    init_timer(100);
-    // test interrupt
-    asm volatile("int $0x02");
-    asm volatile("int $0x04");
-    asm volatile("int $0x06");
-    // 开启中断
-    asm volatile ("sti");
+    // init timer for 8253/8254 PIT
+    init_timer(HZ);
+
+    // int accept
+    // asm volatile ("sti");
+    // 
+    print_cur_status(); // should be 0x216, int accepct
+    
+    // test trap
+    asm volatile("int $0xff");
+
+    // TODO: others
+    // ret to boot.s, loop hlt
     return 0;
 }
 

@@ -44,7 +44,7 @@ update_image:
 
 .PHONY:qemu
 qemu:
-	sudo qemu-system-i386 -hda hda_32M.img -curses
+	sudo qemu-system-i386 -hda hda_32M.img -curses -m 32M
 
 .PHONY:kill
 kill:

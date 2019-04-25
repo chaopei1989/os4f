@@ -36,7 +36,8 @@ MBOOT_CHECKSUM      equ     -(MBOOT_HEADER_MAGIC+MBOOT_HEADER_FLAGS)
 ; -----------------------------------------------------------------------------
 
 [BITS 32]                    ; 所有代码以 32-bit 的方式编译
-section .text                ; 代码段从这里开始
+; section .text                ; 代码段从这里开始
+section .init.text  ; 临时代码段从这里开始
 
                              ; 在代码段的起始位置设置符合 Multiboot 规范的标记
 

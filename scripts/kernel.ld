@@ -7,8 +7,22 @@ SECTIONS
 {
     /* 段起始位置 */
 
-    . = 0x100000;
-    .text :
+    PROVIDE( kern_start = . );
+    . = 0x100000; 
+    .init.text : 
+    {
+        *(.init.text)
+        . = ALIGN(4096);
+    }
+    .init.data : 
+    {
+        *(.init.data)
+        . = ALIGN(4096);
+    }
+
+    . += 0xC0000000;
+
+    .text : AT(ADDR(.text) - 0xC0000000)
     {
         *(.text)
         . = ALIGN(4096);
@@ -38,6 +52,7 @@ SECTIONS
         *(.stabstr)
         . = ALIGN(4096);
     }
+    PROVIDE( kern_end = . );
 
     /DISCARD/ : { *(.comment) *(.eh_frame) }
 }

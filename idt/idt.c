@@ -1,6 +1,6 @@
 #include <idt.h>
 #include <int.h>
-#include <string.h>
+#include <_string.h>
 #include <inout.h>
 
 // 中断描述符表

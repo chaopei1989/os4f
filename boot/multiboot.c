@@ -1,8 +1,10 @@
 #include <_elf.h>
 #include <multiboot.h>
 #include <printk.h>
+#include <_string.h>
 
 // 从 multiboot_t 结构获取ELF信息
+// just for callstack? TODO:
 elf_t elf_from_multiboot(multiboot_t *mb)
 {
     elf_t elf;
@@ -33,6 +35,7 @@ elf_t elf_from_multiboot(multiboot_t *mb)
 }
 
 // 查看ELF的符号信息
+// TODO:
 const char *elf_lookup_symbol(uint32_t addr, elf_t *elf)
 {
     return NULL;

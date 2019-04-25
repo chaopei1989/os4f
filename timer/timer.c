@@ -7,7 +7,7 @@
 
 char buff[1024];
 
-void timer_callback(pt_regs *regs)
+void timer_callback(pt_regs_t *regs)
 {
     static uint32_t tick = 0;
     static uint32_t wall_time = 0;

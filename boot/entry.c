@@ -1,10 +1,11 @@
 #include <console.h>
 #include <gdt.h>
 #include <idt.h>
-#include <string.h>
+#include <_string.h>
 #include <printk.h>
 #include <timer.h>
 #include <multiboot.h>
+#include <mm.h>
 
 static void console_fuck_welcome();
 
@@ -40,6 +41,8 @@ int kern_entry()
 
     // TODO: others
     elf_from_multiboot(glb_mboot_ptr);
+
+    show_memory_map();
 
     // ret to boot.s, loop hlt
     return 0;

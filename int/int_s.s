@@ -74,7 +74,7 @@ isr_common_stub:
     mov gs, ax
     mov ss, ax
 
-    push esp            ; 此时的 esp 寄存器的值等价于 pt_regs 结构体的指针
+    push esp            ; 此时的 esp 寄存器的值等价于 pt_regs_t 结构体的指针
     call isr_handler    ; 在 C 语言代码里
     add esp, 4          ; 清除压入的参数
 

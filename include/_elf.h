@@ -6,7 +6,7 @@
 #include <types.h>
 
 // ELF section head struct, 40bytes
-typedef struct elf_section_header_t
+typedef struct elf_section_header
 {
     uint32_t name;
     uint32_t type;
@@ -22,7 +22,7 @@ typedef struct elf_section_header_t
 
 // custom struct
 // ELF symbol
-typedef struct elf_symbol_t
+typedef struct elf_symbol
 {
     uint32_t name;
     uint32_t value;
@@ -34,7 +34,7 @@ typedef struct elf_symbol_t
 
 // custom struct
 // ELF info
-typedef struct elf_t
+typedef struct elf
 {
     elf_symbol_t *symtab;
     uint32_t symtabsz;

@@ -8,7 +8,7 @@ void register_interrupt_handler(uint8_t n, interrupt_handler_t h)
 }
 
 // 调用中断处理函数
-void isr_handler(pt_regs *regs)
+void isr_handler(pt_regs_t *regs)
 {
     if (interrupt_handlers[regs->int_no])
     {
@@ -21,7 +21,7 @@ void isr_handler(pt_regs *regs)
     }
 }
 
-void irq_handler(pt_regs *regs)
+void irq_handler(pt_regs_t *regs)
 {
     // 发送中断结束信号给 PICs
     // 按照我们的设置，从 32 号中断起为用户自定义中断

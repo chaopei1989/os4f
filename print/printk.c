@@ -1,5 +1,5 @@
 #include <types.h>
-#include <string.h>
+#include <_string.h>
 #include <vargs.h>
 #include <console.h>
 #include <printk.h>

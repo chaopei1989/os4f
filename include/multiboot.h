@@ -3,9 +3,8 @@
 
 #include <types.h>
 #include <_elf.h>
-#include <elf.h>
 
-typedef struct multiboot_t
+typedef struct multiboot
 {
     uint32_t flags; // Multiboot 的版本信息
 
@@ -61,7 +60,7 @@ typedef struct multiboot_t
  * length_low 是内存区域大小的低32位，length_high 是内存区域大小的高 32 位，总共是 64 位
  * type 是相应地址区间的类型，1 代表可用 RAM，所有其它的值代表保留区域
  */
-typedef struct mmap_entry_t
+typedef struct mmap_entry
 {
     uint32_t size; // size 是不含 size 自身变量的大小
     uint32_t base_addr_low;

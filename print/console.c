@@ -1,5 +1,5 @@
 #include <console.h>
-#include <string.h>
+#include <_string.h>
 #include <inout.h>
 
 /**
@@ -43,7 +43,7 @@ struct cursor
  * 当前cursor总是处在一行的开头
  */
 struct cursor s_cursor = {
-    .curr = VIDEO_MSG_START,
+    .curr = (uint16_t *)VIDEO_MSG_START,
     .x = 1,
     .y = 0,
 };

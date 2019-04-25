@@ -4,7 +4,7 @@
 #include <types.h>
 
 // 寄存器类型
-typedef struct pt_regs_t
+typedef struct pt_regs
 {
     uint32_t ds;  // 用于保存用户的数据段描述符
     uint32_t edi; // 从 edi 到 eax 由 pusha 指令压入
@@ -22,10 +22,10 @@ typedef struct pt_regs_t
     uint32_t eflags;
     uint32_t useresp;
     uint32_t ss;
-} pt_regs;
+} pt_regs_t;
 
 // 定义中断处理函数指针
-typedef void (*interrupt_handler_t)(pt_regs *);
+typedef void (*interrupt_handler_t)(pt_regs_t *);
 
 // 中断处理函数的指针数组
 interrupt_handler_t interrupt_handlers[256];
@@ -34,7 +34,7 @@ interrupt_handler_t interrupt_handlers[256];
 void register_interrupt_handler(uint8_t n, interrupt_handler_t h);
 
 // 调用中断处理函数
-void isr_handler(pt_regs *regs);
+void isr_handler(pt_regs_t *regs);
 
 // 声明中断处理函数 0 ~ 19 属于 CPU 的异常中断
 // ISR:中断服务程序(interrupt service routine)
@@ -77,7 +77,7 @@ void isr31();
 void isr255(); // 定义IRQ
 
 // IRQ 处理函数
-void irq_handler(pt_regs *regs);
+void irq_handler(pt_regs_t *regs);
 
 #define IRQ0 32  // 电脑系统计时器
 #define IRQ1 33  // 键盘

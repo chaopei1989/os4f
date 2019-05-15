@@ -11,7 +11,21 @@ static void console_fuck_welcome();
 
 static int check_protect_enable();
 
-int kern_entry()
+static void kern_init();
+
+/**
+ * kernel entry method.
+ * init.text and init.data located at 0x100000+, used for PGD and PTE.
+ */
+__attribute__((section(".init.text"))) void kern_entry()
+{
+    // TODO: load PGD(Page Global Directory) and PTE(Page Table Entry)
+
+
+    kern_init();
+}
+
+static void kern_init()
 {
     // int reject
     asm volatile ("cli");
@@ -45,7 +59,6 @@ int kern_entry()
     show_memory_map();
 
     // ret to boot.s, loop hlt
-    return 0;
 }
 
 static int check_protect_enable()

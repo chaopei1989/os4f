@@ -5,7 +5,7 @@
 #include <printk.h>
 #include <timer.h>
 #include <multiboot.h>
-#include <mm.h>
+#include <vmm.h>
 
 static void console_fuck_welcome();
 
@@ -19,16 +19,14 @@ static void kern_init();
  */
 __attribute__((section(".init.text"))) void kern_entry()
 {
-    // TODO: load PGD(Page Global Directory) and PTE(Page Table Entry)
-
-
+    enable_paging();
     kern_init();
 }
 
 static void kern_init()
 {
     // int reject
-    asm volatile ("cli");
+    asm volatile("cli");
     console_fuck_welcome();
     if (check_protect_enable())
     {
@@ -47,9 +45,9 @@ static void kern_init()
 
     // int accept
     // asm volatile ("sti");
-    // 
+    //
     print_cur_status(); // should be 0x216, int accepct
-    
+
     // test trap
     asm volatile("int $0xff");
 

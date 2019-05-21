@@ -1,6 +1,6 @@
 #include <multiboot.h>
 #include <printk.h>
-#include <mm.h>
+#include <pmm.h>
 
 void show_memory_map()
 {
@@ -28,4 +28,15 @@ void show_memory_map()
                mmap->type,
                mmap->length_low >> 10);
     }
+}
+
+void kmalloc()
+{
+    // TODO: 
+}
+
+void kfree()
+{
+    // TODO:
+
 }

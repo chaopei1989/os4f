@@ -5,7 +5,7 @@
 #include <printk.h>
 #include <gdt.h>
 
-static void printk_buff_args(char *buff, int len, int buff_offset, char *fmt, char *args);
+static void printk_buff_args(char *buff, int32_t len, int32_t buff_offset, char *fmt, char *args);
 
 void printk(char *fmt, ...)
 {
@@ -19,7 +19,7 @@ void printk(char *fmt, ...)
     VA_END(args);
 }
 
-void printk_buff(char *buff, int len, int buff_offset, char *fmt, ...)
+void printk_buff(char *buff, int32_t len, int32_t buff_offset, char *fmt, ...)
 {
     va_list args;
     VA_START(args, fmt);
@@ -28,8 +28,8 @@ void printk_buff(char *buff, int len, int buff_offset, char *fmt, ...)
 }
 
 static void printk_buff_args(char *buff,
-                             int len,
-                             int buff_offset,
+                             int32_t len,
+                             int32_t buff_offset,
                              char *fmt,
                              va_list args)
 {
@@ -54,7 +54,7 @@ static void printk_buff_args(char *buff,
                 ++i;
                 const char *next_arg = VA_ARG(args, const char *);
                 // 取内容
-                int next_arg_len = strlen((const char *)next_arg);
+                int32_t next_arg_len = strlen((const char *)next_arg);
                 if (next_arg_len > 0 && next_arg_len + buff_offset <= len - 1)
                 {
                     memcpy((void *)buff + buff_offset, (void *)next_arg, next_arg_len);
@@ -65,11 +65,11 @@ static void printk_buff_args(char *buff,
             case 'x':
             {
                 ++i;
-                unsigned int next_arg = VA_ARG(args, unsigned int);
+                uint32_t next_arg = VA_ARG(args, uint32_t);
                 char msg[11];
                 // 取值
-                h32toa((unsigned int)next_arg, msg);
-                int next_arg_len;
+                h32toa((uint32_t)next_arg, msg);
+                int32_t next_arg_len;
                 next_arg_len = sizeof(msg) - 1;
                 if (next_arg_len > 0 && next_arg_len + buff_offset <= len - 1)
                 {
@@ -81,10 +81,10 @@ static void printk_buff_args(char *buff,
             case 'd':
             {
                 ++i;
-                unsigned int next_arg = VA_ARG(args, unsigned int);
+                uint32_t next_arg = VA_ARG(args, uint32_t);
                 char msg[11];
                 // 取值
-                int next_arg_len = itoa((int)next_arg, msg);
+                int32_t next_arg_len = itoa((int32_t)next_arg, msg);
                 if (next_arg_len > 0 && next_arg_len + buff_offset <= len - 1)
                 {
                     memcpy((void *)buff + buff_offset, (void *)msg, next_arg_len);

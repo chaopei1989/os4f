@@ -9,7 +9,7 @@
 
 static void console_fuck_welcome();
 
-static int check_protect_enable();
+static int32_t check_protect_enable();
 
 static void kern_init();
 
@@ -59,7 +59,7 @@ static void kern_init()
     // ret to boot.s, loop hlt
 }
 
-static int check_protect_enable()
+static int32_t check_protect_enable()
 {
     uint32_t reg_cr0 = 0;
 

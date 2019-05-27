@@ -9,7 +9,7 @@ void *memset(void *s, char ch, size_t n)
     return s;
 }
 
-void *memcpy(void *dest, void *src, unsigned int count)
+void *memcpy(void *dest, void *src, uint32_t count)
 {
     for (size_t i = 0; i < count; i++)
     {
@@ -20,7 +20,7 @@ void *memcpy(void *dest, void *src, unsigned int count)
 
 size_t strlen(char const *str)
 {
-    int len = 0;
+    int32_t len = 0;
     do
     {
         if (*str != 0)
@@ -36,14 +36,14 @@ size_t strlen(char const *str)
     return len;
 }
 
-void h32toa(unsigned int hex32, char *c)
+void h32toa(uint32_t hex32, char *c)
 {
     // hex-4字节, c-10字符
     c[0] = '0';
     c[1] = 'x';
     for (size_t i = 0; i < 8; i++)
     {
-        int t = 0xf & (hex32 >> (i << 2));
+        int32_t t = 0xf & (hex32 >> (i << 2));
         if (t < 10)
         {
             c[7 - i + 2] = t + '0';
@@ -56,9 +56,9 @@ void h32toa(unsigned int hex32, char *c)
     c[10] = '\0';
 }
 
-int itoa(int n, char *s)
+int32_t itoa(int32_t n, char *s)
 {
-    int i, j, sign;
+    int32_t i, j, sign;
 
     if ((sign = n) < 0)
     {
@@ -76,7 +76,7 @@ int itoa(int n, char *s)
     }
     s[i] = '\0';
     // i size
-    const int size = i;
+    const int32_t size = i;
     for (j = 0; j < (size >> 1); j++)
     {
         // change s[j] and s[size-1-j]
@@ -87,9 +87,9 @@ int itoa(int n, char *s)
     return size;
 }
 
-int strcmp(const char *s1, const char *s2)
+int32_t strcmp(const char *s1, const char *s2)
 {
-    int i = 0;
+    int32_t i = 0;
     for (;;)
     {
         if (s1[i] == s2[i])

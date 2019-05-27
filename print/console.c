@@ -83,13 +83,13 @@ void console_clear()
 
 void console_write_line(const char *msg)
 {
-    int end = 0;
+    int32_t end = 0;
     char tmp[LEN_SINGLE_LINE];
     for (;;)
     {
         // split by '\n'
         memset(tmp, 0, LEN_SINGLE_LINE);
-        for (int i = 0; i < LEN_SINGLE_LINE; i++)
+        for (int32_t i = 0; i < LEN_SINGLE_LINE; i++)
         {
             if (*msg != 0)
             {
@@ -154,7 +154,7 @@ static void _console_print_line(uint16_t *base_addr,
                                 real_color_t f_color,
                                 real_color_t b_color)
 {
-    int end = 0;
+    int32_t end = 0;
     for (size_t i = 0; i < LEN_SINGLE_LINE; i++)
     {
         if (!end) // 没到要显示字符的结尾

@@ -63,7 +63,7 @@ void print_cur_gdt()
            "Index|Base      |Limit     |Access    |Gran      ",
            reg_gdtr.base,
            reg_gdtr.limit);
-    for (int i = 0; i < (reg_gdtr.limit + 1) / 8; i++)
+    for (int32_t i = 0; i < (reg_gdtr.limit + 1) / 8; i++)
     {
         uint32_t base = ((cur_gdts + i)->base_low) |
                         ((cur_gdts + i)->base_middle << 16) |

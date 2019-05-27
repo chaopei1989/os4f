@@ -6,16 +6,19 @@ char kern_stack[STACK_SIZE];
 // before page available, we need tmp pgd and pte under 1M memory.
 // And this pgd and pte are one-page-align(4KB, 0x1000)
 // TODO: why 0x1000? 0-640KB not used in grub?
+
 __attribute__((section(".init.data"))) pgd_t *pgd_tmp = (pgd_t *)0x1000;
 
 __attribute__((section(".init.data"))) pgd_t *pte_low = (pgd_t *)0x2000;
 
 __attribute__((section(".init.data"))) pgd_t *pte_high = (pgd_t *)0x3000;
 
-int enable_paging()
+__attribute__((section(".init.data"))) int32_t enable_paging()
 {
     // TODO: load PGD(Page Global Directory) and PTE(Page Table Entry)
-    
+    // TODO: low 4M memory and high 4M virtual memory all map to low 4M physical memory.
+    pgd_tmp[0] = (uint32_t) pte_low | PAGE_PRESENT | PAGE_WRITE;
+
     // tmp pgd and pte
     asm volatile("mov %0, %%cr3"
                  :

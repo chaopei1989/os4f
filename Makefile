@@ -9,9 +9,9 @@ CC = gcc
 LD = ld
 ASM = nasm
 
-LOOP_DEV = /dev/loop24
+LOOP_DEV = /dev/loop30
 
-C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include
+C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -I include -fno-pie
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -f elf -g -F stabs
 
@@ -44,18 +44,20 @@ update_image:
 
 .PHONY:qemu
 qemu:
+	sudo qemu-system-i386 -hda hda_32M.img -m 32M
+
+.PHONY:qemu-curses
+qemu-curses:
 	sudo qemu-system-i386 -hda hda_32M.img -curses -m 32M
+
+.PHONY:debug-qemu
+debug-qemu:
+	sudo qemu-system-i386 -S -kernel kernel.bin -hda hda_32M.img -m 32M
+
+.PHONY:debug-qemu-curses
+debug-qemu-curses:
+	sudo qemu-system-i386 -S -kernel kernel.bin -hda hda_32M.img -m 32M
 
 .PHONY:kill
 kill:
 	ps -ef | grep qemu | grep -v grep | awk '{print $$2}'|xargs sudo kill -9
-
-.PHONY:bochs
-bochs:
-	bochs -f tools/bochsrc.txt
-
-.PHONY:debug
-debug:
-	qemu -S -s -fda floppy.img -boot a &
-	sleep 1
-	cgdb -x tools/gdbinit

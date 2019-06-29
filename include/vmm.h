@@ -3,8 +3,12 @@
 
 #include<types.h>
 
-// 内核的偏移地址
+/**
+ *  mem offset used by kernel after paging.
+ */
 #define PAGE_OFFSET     0xC0000000
+
+#define PAGING(addr) (PAGE_OFFSET + addr)
 
 /**
  * For pgd or pte, low 0(P) bit refer to whether vm available.
@@ -44,6 +48,8 @@ typedef uint32_t pgd_t;
 // 页表数据类型
 typedef uint32_t pte_t;
 
-int32_t enable_paging();
+#define INDEX_PGD(addr) (((addr) >> 22) & 0x3FF)
+
+#define INDEX_PTE(addr) (((addr) >> 12) & 0x3FF)
 
 #endif

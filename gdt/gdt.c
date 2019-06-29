@@ -30,8 +30,10 @@ void init_gdt()
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // 数据段
     gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // 用户模式代码段
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // 用户模式数据段
-    // 加载全局描述符表地址到 GPTR 寄存器
-    printk("Flush GDT");
+    // 加载全局描述符表地址到 GDTR 寄存器
+    printk("Flush GDT: %x", &gdt_ptr);
+    // print_cur_gdt();
+    // for(;;);
     gdt_flush((uint32_t)&gdt_ptr);
     print_cur_gdt();
 }

@@ -1,6 +1,8 @@
 #include <console.h>
 #include <_string.h>
 #include <inout.h>
+#include <vmm.h>
+#include <pmm.h>
 
 /**
  * VGA 0xB8000～0xB8F9F~0xBFFFF
@@ -16,12 +18,6 @@
  * 
  * TODO: 其他分辨率暂时不管 
  */
-#define VIDEO_MSG_START 0xB80A0
-
-#define VIDEO_H_STAT_START 0xB8000
-
-#define VIDEO_T_STAT_START 0xB8F00
-
 #define LEN_SINGLE_LINE 80
 
 #define LEN_ROWS 25
@@ -31,6 +27,12 @@
 #define DEFAULT_FOREGROUND_COLOR rc_white
 
 #define DEFAULT_BACKGROUND_COLOR rc_black
+
+#define VIDEO_H_STAT_START (PAGING(VGA_START))
+
+#define VIDEO_MSG_START (PAGING(VGA_START) + BYTE_SINGLE_LINE)
+
+#define VIDEO_T_STAT_START (PAGING(VGA_START) + BYTE_SINGLE_LINE * (LEN_ROWS - 1))
 
 struct cursor
 {

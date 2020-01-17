@@ -38,44 +38,44 @@ __attribute__((section(".init.data"))) pte_t *pte_high_4M = (pte_t *)0x3000;
  */
 __attribute__((section(".init.text"))) void kern_entry()
 {
-    // enable paging first.
-    // load PGD(Page Global Directory) and PTE(Page Table Entry)
-    pgd_tmp[0] = (uint32_t) pte_low_4M | PAGE_PRESENT | PAGE_WRITE;
-    pgd_tmp[INDEX_PGD(PAGE_OFFSET)] = (uint32_t) pte_high_4M | PAGE_PRESENT | PAGE_WRITE;
+    // // enable paging first.
+    // // load PGD(Page Global Directory) and PTE(Page Table Entry)
+    // pgd_tmp[0] = (uint32_t) pte_low_4M | PAGE_PRESENT | PAGE_WRITE;
+    // pgd_tmp[INDEX_PGD(PAGE_OFFSET)] = (uint32_t) pte_high_4M | PAGE_PRESENT | PAGE_WRITE;
 
-    for (int32_t i = 0; i < 1024; i++)
-    {
-        // every 4KB for one pte.
-        pte_low_4M[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
-        // low 4M memory and high 4M virtual memory all map to low 4M physical memory.
-        pte_high_4M[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
-    }
+    // for (int32_t i = 0; i < 1024; i++)
+    // {
+    //     // every 4KB for one pte.
+    //     pte_low_4M[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
+    //     // low 4M memory and high 4M virtual memory all map to low 4M physical memory.
+    //     pte_high_4M[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
+    // }
 
-    // tmp pgd and pte
-    asm volatile("mov %0, %%cr3"
-                 :
-                 : "r"(pgd_tmp));
+    // // tmp pgd and pte
+    // asm volatile("mov %0, %%cr3"
+    //              :
+    //              : "r"(pgd_tmp));
 
-    // enable paging, cr0 paging set 1
-    uint32_t cr0;
-    asm volatile("mov %%cr0, %0"
-                 : "=r"(cr0));
-    cr0 |= 0x80000000;
-    asm volatile("mov %0, %%cr0"
-                 :
-                 : "r"(cr0));
+    // // enable paging, cr0 paging set 1
+    // uint32_t cr0;
+    // asm volatile("mov %%cr0, %0"
+    //              : "=r"(cr0));
+    // cr0 |= 0x80000000;
+    // asm volatile("mov %0, %%cr0"
+    //              :
+    //              : "r"(cr0));
 
-    // switch kernel stack, so paging cannot be a method(cannot return successfully).
-    asm volatile(
-        "mov %0, %%esp;"
-        "xor %%ebp, %%ebp;"
-        :
-        : "r"(kern_stack));
+    // // switch kernel stack, so paging cannot be a method(cannot return successfully).
+    // asm volatile(
+    //     "mov %0, %%esp;"
+    //     "xor %%ebp, %%ebp;"
+    //     :
+    //     : "r"(kern_stack));
+
+    // glb_mboot_ptr = tmp_mboot_ptr + PAGE_OFFSET;
 
     // welcome, m*ther f*cker.
     console_fuck_welcome();
-
-    glb_mboot_ptr = tmp_mboot_ptr + PAGE_OFFSET;
 
     kern_init();
 }

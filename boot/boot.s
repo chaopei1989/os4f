@@ -66,8 +66,8 @@ stop:
 
 section .init.data                 ; 未初始化的数据段从这里开始
 tmp_stack:
-    times 1024 db 0               ; 这里作为内核栈
-TMP_STACK_TOP equ $-tmp_stack-1      ; 内核栈顶，$ 符指代是当前地址
+    resb 65536               ; 这里作为内核栈 64KB
+TMP_STACK_TOP equ $-1      ; 内核栈顶，$ 符指代是当前地址
 tmp_mboot_ptr:               ; 全局的 multiboot 结构体指针
     dd 0
 

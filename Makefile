@@ -52,7 +52,7 @@ qemu-curses:
 
 .PHONY:debug-qemu
 debug-qemu:
-	sudo qemu-system-i386 -S -kernel kernel.bin -hda hda_32M.img -m 32M
+	sudo qemu-system-i386 -s -S -kernel kernel.bin -hda hda_32M.img -m 32M
 
 .PHONY:debug-qemu-curses
 debug-qemu-curses:

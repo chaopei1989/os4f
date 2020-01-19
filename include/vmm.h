@@ -6,7 +6,7 @@
 /**
  *  mem offset used by kernel after paging.
  */
-#define PAGE_OFFSET     0x0 // 0xC0000000
+#define PAGE_OFFSET     0xC0000000
 
 #define PAGING(addr) (PAGE_OFFSET + addr)
 

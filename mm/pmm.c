@@ -30,13 +30,27 @@ void show_memory_map()
     }
 }
 
+void init_pmm()
+{
+    // TODO:
+}
+
+void alloc_page(int order)
+{
+    // TODO:
+}
+
+void free_page(uint32_t addr, int order)
+{
+    // TODO:
+}
+
 void kmalloc()
 {
-    // TODO: 
+    // TODO:
 }
 
 void kfree()
 {
     // TODO:
-
 }

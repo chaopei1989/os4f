@@ -2,6 +2,7 @@
 #include <multiboot.h>
 #include <printk.h>
 #include <_string.h>
+#include <vmm.h>
 
 // 从 multiboot_t 结构获取ELF信息
 // just for callstack? TODO:
@@ -18,16 +19,16 @@ elf_t elf_from_multiboot(multiboot_t *mb)
     elf_section_header_t *shstrtabptr = headsptr + mb->shndx;
     for (size_t i = 0; i < mb->num; i++)
     {
-        const char *name = (const char *)(shstrtabptr->addr + headsptr[i].name);
+        const char *name = (const char *)(shstrtabptr->addr + headsptr[i].name) + PAGE_OFFSET;
         printk("section name: %s", name);
         if (strcmp(name, ".strtab") == 0)
         {
-            elf.strtab = (const char *)headsptr[i].addr;
+            elf.strtab = (const char *)headsptr[i].addr + PAGE_OFFSET;
             elf.strtabsz = headsptr[i].size;
         }
         else if (strcmp(name, ".symtab") == 0)
         {
-            elf.symtab = (elf_symbol_t *)headsptr[i].addr;
+            elf.symtab = (elf_symbol_t *)headsptr[i].addr + PAGE_OFFSET;
             elf.symtabsz = headsptr[i].size;
         }
     }

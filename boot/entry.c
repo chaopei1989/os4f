@@ -66,11 +66,12 @@ __attribute__((section(".init.text"))) void kern_entry()
                  : "r"(cr0));
 
     // switch kernel stack, so paging cannot be a method(cannot return successfully).
+    // 满递减
     asm volatile(
         "mov %0, %%esp;"
         "xor %%ebp, %%ebp;"
         :
-        : "r"(kern_stack + STACK_SIZE - 1));
+        : "r"(kern_stack + STACK_SIZE));
 
     glb_mboot_ptr = tmp_mboot_ptr + PAGE_OFFSET;
 
@@ -111,6 +112,8 @@ static void kern_init()
     elf_from_multiboot(glb_mboot_ptr);
 
     show_memory_map();
+    init_pmm();
+
 
     for (;;)
     {

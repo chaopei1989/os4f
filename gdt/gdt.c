@@ -22,27 +22,6 @@ void init_gdt()
     // 全局描述符表界限 e.g. 从 0 开始，所以总长要 - 1
     gdt_ptr.limit = sizeof(gdt_entry_t) * GDT_LENGTH - 1;
     gdt_ptr.base = (uint32_t)&gdt_entries;
-    printk("gdt_ptr: 0"
-           "gdt_ptr_H32= %x; "
-           "gdt_ptr_L16= %x;\n",
-           gdt_ptr.base,
-           gdt_ptr.limit);
-    printk("gdt_ptr: 1"
-           "gdt_ptr_H32= %x; "
-           "gdt_ptr_L16= %x;\n",
-           gdt_ptr.base,
-           gdt_ptr.limit);
-    printk("gdt_ptr: 2"
-           "gdt_ptr_H32= %x; "
-           "gdt_ptr_L16= %x;\n",
-           gdt_ptr.base,
-           gdt_ptr.limit);
-    printk("gdt_ptr: 3"
-           "gdt_ptr_H32= %x; "
-           "gdt_ptr_L16= %x;\n",
-           gdt_ptr.base,
-           gdt_ptr.limit);
-
     // 采用 Intel 平坦模型
     printk("Init GDT Now");
     printk("gdt_ptr: 4"

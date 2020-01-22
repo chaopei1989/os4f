@@ -67,7 +67,7 @@ typedef struct mmap_entry
     uint32_t base_addr_high;
     uint32_t length_low;
     uint32_t length_high;
-    uint32_t type;
+    uint32_t type; // 1-可用内存， 其他-保留区域
 } __attribute__((packed)) mmap_entry_t;
 
 // 声明全局的 multiboot_t * 指针

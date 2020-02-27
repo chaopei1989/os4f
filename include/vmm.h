@@ -2,9 +2,10 @@
 #define INCLUDE_VMM_H_
 
 #include<types.h>
+#include<page.h>
 
 /**
- *  mem offset used by kernel after paging.
+ *  mem offset used by kernel after paging. 3GB
  */
 #define PAGE_OFFSET     0xC0000000
 
@@ -35,12 +36,6 @@
  * 页目录项中的 U/S 位对其所映射的所有页面起作用。
  */
 #define PAGE_USER   0x4
-
-// 虚拟分页大小
-#define PAGE_SIZE   4096
-
-// 页掩码，用于 4KB 对齐
-#define PAGE_MASK      0xFFFFF000
 
 // 页目录数据类型
 typedef uint32_t pgd_t;
